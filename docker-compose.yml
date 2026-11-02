@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: afromind-agents-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: afromind_agents
+      POSTGRES_USER: afromind
+      POSTGRES_PASSWORD: change-this-local-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - agents_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U afromind -d afromind_agents"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: afromind-agents-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - agents_redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  agents_postgres_data:
+  agents_redis_data:
